@@ -2,22 +2,20 @@ package ioio.examples.hello;
 
 /**
  * ***********************************************************************
- * Chord keyboard test ver 150920B
+ * Chord keyboard test ver 150921A
  * Copyright 2015 Wintriss Technical Schools
  * All rights reserved
+ * Stanley version running on laptop
  * ************************************************************************
  */
 
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import java.util.Locale;
-
 import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
