@@ -11,6 +11,8 @@ package ioio.examples.hello;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
+import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -92,6 +94,7 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         mText = (TextView) findViewById(R.id.logText);
+        mScroller = (ScrollView) findViewById(R.id.scroller);
     }
 
     @Override
@@ -169,8 +172,8 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
         {
             public void run()
             {
-                mText.setText(" ");
-                mText.append("\r" + msg);
+                mText.setText(msg);
+                mScroller.fullScroll(View.FOCUS_DOWN);
             }
         });
     }
