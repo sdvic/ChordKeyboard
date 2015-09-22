@@ -1,14 +1,13 @@
 package ioio.examples.hello;
 
-/**
- * ***********************************************************************
- * Chord keyboard test ver 150921B
+ /* ***********************************************************************
+ * Chord keyboard test ver 150921C
  * Copyright 2015 Wintriss Technical Schools
  * All rights reserved
  * Stanley version running on laptop
  * changed button collecting code
- * ************************************************************************
- */
+ * removed speech code
+ * ************************************************************************/
 
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -16,9 +15,6 @@ import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import java.util.Locale;
-
 import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
@@ -26,9 +22,9 @@ import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
 
-public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitListener {
+public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitListener
+{
     private TextView mText;
-    private TextToSpeech mTts;
     private ScrollView mScroller;
     private DigitalOutput led;//The IOIO board LED
     private DigitalInput thumb;
@@ -41,7 +37,6 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
     public static final int MIDDLE_PIN = 21;
     public static final int RING_PIN = 22;
     public static final int PINKIE_PIN = 23;
-    private byte fingerCode;
     private String nextWord = "";
     long startTime;
     private char[] asciiCode =
@@ -90,7 +85,8 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
      */
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         mText = (TextView) findViewById(R.id.logText);
@@ -98,13 +94,16 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
     }
 
     @Override
-    public void onInit(int status) {
+    public void onInit(int status)
+    {
 
     }
 
-    class Looper extends BaseIOIOLooper {
+    class Looper extends BaseIOIOLooper
+    {
         @Override
-        protected void setup() throws ConnectionLostException {
+        protected void setup() throws ConnectionLostException
+        {
             led = ioio_.openDigitalOutput(0, true);
             thumb = ioio_.openDigitalInput(THUMB_PIN, DigitalInput.Spec.Mode.PULL_UP);
             indexFinger = ioio_.openDigitalInput(INDEX_PIN, DigitalInput.Spec.Mode.PULL_UP);
@@ -114,26 +113,27 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
         }
 
         @Override
-        public void loop() throws ConnectionLostException, InterruptedException {
+        public void loop() throws ConnectionLostException, InterruptedException
+        {
             startTime = SystemClock.currentThreadTimeMillis();
             led.write(true);
-            fingerCode = 0;
-            while ((SystemClock.currentThreadTimeMillis() - startTime) < 1000) {
-                fingerCode = (byte) (!thumb.read() ? (fingerCode | 0x10) : fingerCode | 0);
-                fingerCode = (byte) (!indexFinger.read() ? (fingerCode | 0x8) : fingerCode | 0);
-                fingerCode = (byte) (!middleFinger.read() ? (fingerCode | 0x4) : fingerCode | 0);
-                fingerCode = (byte) (!ringFinger.read() ? (fingerCode | 0x2) : fingerCode | 0);
-                fingerCode = (byte) (!pinkie.read() ? (fingerCode | 0x10) : fingerCode | 0);
-
+            byte fingerCode = 0;
+            while ((SystemClock.currentThreadTimeMillis() - startTime) < 1000)
+            {
+                fingerCode = (byte) (!thumb.read() ? (fingerCode | 0x10) : fingerCode);
+                fingerCode = (byte) (!indexFinger.read() ? (fingerCode | 0x8) : fingerCode);
+                fingerCode = (byte) (!middleFinger.read() ? (fingerCode | 0x4) : fingerCode);
+                fingerCode = (byte) (!ringFinger.read() ? (fingerCode | 0x2) : fingerCode);
+                fingerCode = (byte) (!pinkie.read() ? (fingerCode | 0x10) : fingerCode);
             }
-            if (fingerCode == 0x1f && nextWord.length() >= 1)//back delete
+            if ((fingerCode == 0x1f) && (nextWord.length() > 0))//back delete
             {
                 nextWord = nextWord.substring(0, nextWord.length() - 1);
                 log(nextWord);
-                fingerCode = 0;
                 return;
             }
-            if (fingerCode != 0) {
+            if (fingerCode != 0)
+            {
                 nextWord = nextWord + asciiCode[fingerCode];
                 log(nextWord);
             }
@@ -143,23 +143,20 @@ public class MainActivity extends IOIOActivity implements TextToSpeech.OnInitLis
     }
 
     @Override
-    protected IOIOLooper createIOIOLooper() {
+    protected IOIOLooper createIOIOLooper()
+    {
         return new Looper();
     }
 
-    public void log(final String msg) {
-        runOnUiThread(new Runnable() {
-            public void run() {
+    public void log(final String msg)
+    {
+        runOnUiThread(new Runnable()
+        {
+            public void run()
+            {
                 mText.setText(msg);
                 mScroller.fullScroll(View.FOCUS_DOWN);
             }
         });
-    }
-
-    public void speak(String stuffToSay) {
-        mTts.setLanguage(Locale.US);
-        if (!mTts.isSpeaking()) {
-            mTts.speak(stuffToSay, TextToSpeech.QUEUE_FLUSH, null);
-        }
     }
 }
